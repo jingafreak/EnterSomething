@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace EnterSomething
@@ -114,8 +115,11 @@ namespace EnterSomething
                 this.FormBorderStyle = FormBorderStyle.Sizable;
                 this.CenterToScreen();
 
-                Client.Connect(this);
-                
+                Thread tClientLoop = new Thread(delegate ()
+                {
+                    Client.Connect(this);
+                });
+
                 this.tbClientIP.Text = "";
                 this.tbClientUsername.Text = "";
             }
