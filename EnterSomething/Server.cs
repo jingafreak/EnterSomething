@@ -9,7 +9,8 @@ namespace EnterSomething
 {
     public class Server
     {
-        private static Socket _serverSocket;
+        private static Socket _serverSocketReceive;
+        private static Socket _serverSocketSend;
         public static bool _serverOnline;
         private const int PORT = 3131;
         private const int BUFFER_SIZE = 2048;
@@ -24,16 +25,16 @@ namespace EnterSomething
             if (!_serverOnline)
             {
                 _gui.tbServerOutput.Text += "[Server] Setting up Server...\r\n";
-                _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                _serverSocket.Bind(new IPEndPoint(IPAddress.Any, PORT));
-                _serverSocket.Listen(0);
+                _serverSocketReceive = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                _serverSocketReceive.Bind(new IPEndPoint(IPAddress.Any, PORT));
+                _serverSocketReceive.Listen(0);
                 Thread tAcceptUserLoop = new Thread(delegate ()
                 {
                     while (true)
                     {
                         new Thread(delegate ()
                         {
-                            _serverSocket.BeginAccept(AcceptUser, null);
+                            _serverSocketReceive.BeginAccept(AcceptUser, null);
                         });
                     }
                 });
@@ -51,7 +52,7 @@ namespace EnterSomething
                 user.getSocket().Shutdown(SocketShutdown.Both);
                 user.getSocket().Close();
             }
-            _serverSocket.Close();
+            _serverSocketReceive.Close();
             _serverOnline = false;
             _gui.tbServerOutput.Text += "[Server] Server Shutdown successfull\r\n";
         }
@@ -61,7 +62,7 @@ namespace EnterSomething
 
             try
             {
-                socket = _serverSocket.EndAccept(AR);
+                socket = _serverSocketReceive.EndAccept(AR);
             }
             catch (ObjectDisposedException) // I cannot seem to avoid this (on exit when properly closing sockets)
             {
@@ -91,11 +92,20 @@ namespace EnterSomething
             {
                 _users.Add(new User(current, text.Substring(9)));
                 _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
+                Thread tSend = new Thread(delegate ()
+                {
+                    _serverSocketSend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    while (!_serverSocketSend.Connected)
+                    {
+                        _serverSocketSend.Connect(current.RemoteEndPoint as IPEndPoint);
+                    }
+                    SendCommand("!accepted");
+                });
                 current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
             }
             else
             {
-                _serverSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, current);
+                _serverSocketReceive.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, current);
             }
         }
         private static void ReceiveMessage(IAsyncResult AR)
@@ -134,6 +144,11 @@ namespace EnterSomething
                 _gui.tbServerOutput.Text += text;
                 current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
             }
+        }
+        public static void SendCommand(String command)
+        {
+            byte[] buffer = Encoding.ASCII.GetBytes(command);
+            _serverSocketSend.Send(buffer, 0, buffer.Length, SocketFlags.None);
         }
         public static void ValidateCommand(String command, Socket userSocket)
         {

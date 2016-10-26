@@ -11,6 +11,7 @@ namespace EnterSomething
     {
         private static Socket _clientSocketReceive;
         private static Socket _clientSocketSend;
+        private static bool _clientConnected;
         private const int PORT = 3131;
         private const int BUFFER_SIZE = 2048;
         private static byte[] buffer = new byte[BUFFER_SIZE];
@@ -38,9 +39,6 @@ namespace EnterSomething
                     Console.WriteLine(e.StackTrace);
                 }
             }
-            SendUsername();
-            Thread.Sleep(500);
-            _gui.tbClientOutput.Text += "[Server] Connected\r\n";
             Thread tListenLoop = new Thread(delegate ()
             {
                 _clientSocketReceive = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -50,6 +48,9 @@ namespace EnterSomething
                     _clientSocketReceive.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, AcceptServer, _clientSocketReceive);
                 }
             });
+            while (!_clientConnected) {
+                SendUsername();
+            }
         }
         public static void Disconnect()
         {
@@ -90,8 +91,15 @@ namespace EnterSomething
             byte[] recBuf = new byte[received];
             Array.Copy(buffer, recBuf, received);
             string text = Encoding.ASCII.GetString(recBuf);
-            _gui.tbClientOutput.Text += text;
-            current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
+            if (text.Substring(0, 1) == "!")
+            {
+                ValidateCommand(text, current);
+            }
+            else
+            {
+                _gui.tbClientOutput.Text += text;
+                current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
+            }
         }
         public static void SendMessage()
         {
@@ -107,6 +115,13 @@ namespace EnterSomething
         {
             byte[] buffer = Encoding.ASCII.GetBytes("Username:" + Client._username);
             _clientSocketSend.Send(buffer, 0, buffer.Length, SocketFlags.None);
+        }
+        public static void ValidateCommand(String command, Socket serverSocket)
+        {
+            if (command == "!accepted")
+            {
+                _gui.tbClientOutput.Text += "[Server] Connected\r\n";
+            }
         }
     }
 }
