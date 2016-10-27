@@ -122,6 +122,7 @@ namespace EnterSomething
 
                 this.tbClientIP.Text = "";
                 this.tbClientUsername.Text = "";
+                this.tbClientInput.ReadOnly = false;
             }
             else
             {

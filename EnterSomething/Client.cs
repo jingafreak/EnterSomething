@@ -121,6 +121,7 @@ namespace EnterSomething
             if (command == "!accepted")
             {
                 _gui.tbClientOutput.Text += "[Server] Connected\r\n";
+                _clientConnected = true;
             }
         }
     }

@@ -59,7 +59,7 @@ namespace EnterSomething
         private static void AcceptUser(IAsyncResult AR)
         {
             Socket socket;
-
+            Console.WriteLine("Trying accepting User");
             try
             {
                 socket = _serverSocketReceive.EndAccept(AR);
@@ -68,6 +68,7 @@ namespace EnterSomething
             {
                 return;
             }
+            Console.WriteLine("User accepted");
             socket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, socket);
         }
         private static void ReceiveUsername(IAsyncResult AR)
@@ -88,25 +89,26 @@ namespace EnterSomething
             byte[] recBuf = new byte[received];
             Array.Copy(buffer, recBuf, received);
             string text = Encoding.ASCII.GetString(recBuf);
-            if (text.Substring(0, 9) == "Username:")
-            {
-                _users.Add(new User(current, text.Substring(9)));
-                _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
-                Thread tSend = new Thread(delegate ()
-                {
-                    _serverSocketSend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    while (!_serverSocketSend.Connected)
-                    {
-                        _serverSocketSend.Connect(current.RemoteEndPoint as IPEndPoint);
-                    }
-                    SendCommand("!accepted");
-                });
-                current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
-            }
-            else
-            {
-                _serverSocketReceive.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, current);
-            }
+            //if (text.Substring(0, 9) == "Username:")
+            //{
+            //    _users.Add(new User(current, text.Substring(9)));
+            //    _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
+            //    Thread tSend = new Thread(delegate ()
+            //    {
+            //        _serverSocketSend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //        while (!_serverSocketSend.Connected)
+            //        {
+            //            _serverSocketSend.Connect(current.RemoteEndPoint as IPEndPoint);
+            //        }
+            //        SendCommand("!accepted");
+            //    });
+            //    current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
+            //}
+            //else
+            //{
+            //    _serverSocketReceive.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, current);
+            //}
+            Console.WriteLine(text);
         }
         private static void ReceiveMessage(IAsyncResult AR)
         {
