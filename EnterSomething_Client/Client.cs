@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace EnterSomething_Client
 {
@@ -27,9 +28,9 @@ namespace EnterSomething_Client
             {
                 try
                 {
-                    if (_gui.tbClientIP.Text.ToLower().Trim() == "loopback")
+                    if (_gui.tbClientIP.Text.ToLower().Trim() == "loopback" || _gui.tbClientIP.Text.ToLower().Trim() == "lb")
                     {
-                        _clientSocket.Connect(IPAddress.Parse("127.0.0.1"), PORT);
+                        _clientSocket.Connect(IPAddress.Loopback, PORT);
                     }
                     else
                     {
@@ -42,28 +43,34 @@ namespace EnterSomething_Client
                 }
             }
             _clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, _clientSocket);
-            while (!_clientConnected) {
+            while (!_clientConnected)
+            {
                 SendUsername();
+                Console.WriteLine(_clientConnected);
+                Thread.Sleep(1000);
             }
+            Console.WriteLine(_clientConnected);
         }
         public static void Disconnect()
         {
             SendCommand("!exit");
             _clientSocket.Close();
             _clientSocket.Close();
+            _clientConnected = false;
         }
         public static void ReceiveMessage(IAsyncResult AR)
         {
-            Socket current = (Socket)AR.AsyncState;
+            Console.WriteLine("Received Sth");
+            Socket serverSocket = (Socket)AR.AsyncState;
             int received;
 
             try
             {
-                received = current.EndReceive(AR);
+                received = serverSocket.EndReceive(AR);
             }
             catch (SocketException)
             {
-                current.Close();
+                serverSocket.Close();
                 return;
             }
 
@@ -72,17 +79,18 @@ namespace EnterSomething_Client
             string text = Encoding.ASCII.GetString(recBuf);
             if (text.Substring(0, 1) == "!")
             {
-                ValidateCommand(text, current);
+                Console.WriteLine("its a command: \"" + text + "\"");
+                ValidateCommand(text, serverSocket);
             }
             else
             {
                 _gui.tbClientOutput.Text += text;
             }
-            current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
+            _clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, _clientSocket);
         }
         public static void SendMessage()
         {
-            byte[] buffer = Encoding.ASCII.GetBytes(_gui.tbClientInput.Text + "\r\n");
+            byte[] buffer = Encoding.ASCII.GetBytes("[" + _username + "] " + _gui.tbClientInput.Text + "\r\n");
             _clientSocket.Send(buffer, 0, buffer.Length, SocketFlags.None);
         }
         public static void SendCommand(String command)
@@ -99,8 +107,12 @@ namespace EnterSomething_Client
         {
             if (command == "!accepted")
             {
-                _gui.tbClientOutput.Text += "[Server] Connected\r\n";
+                Console.WriteLine("command validation reached");
                 _clientConnected = true;
+                _gui.tbClientOutput.Invoke((MethodInvoker)delegate ()
+                {
+                    _gui.tbClientOutput.Text += "[Server] Connected\r\n";
+                });
             }
         }
     }

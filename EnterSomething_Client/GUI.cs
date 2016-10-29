@@ -42,11 +42,8 @@ namespace EnterSomething_Client
                 this.MinimizeBox = true;
                 this.FormBorderStyle = FormBorderStyle.Sizable;
                 this.CenterToScreen();
-
-                Thread tClientLoop = new Thread(delegate ()
-                {
-                    Client.Connect(this);
-                });
+                
+                Client.Connect(this);
 
                 this.tbClientIP.Text = "";
                 this.tbClientUsername.Text = "";

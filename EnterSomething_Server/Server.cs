@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace EnterSomething
 {
@@ -27,7 +28,7 @@ namespace EnterSomething
 
                 _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 _serverSocket.Bind(new IPEndPoint(IPAddress.Any, PORT));
-                _serverSocket.Listen(0);
+                _serverSocket.Listen(10);
                 _serverSocket.BeginAccept(AcceptUser, null);
 
                 _serverOnline = true;
@@ -51,32 +52,30 @@ namespace EnterSomething
         }
         private static void AcceptUser(IAsyncResult AR)
         {
-            Socket socket;
-            Console.WriteLine("Trying accepting User");
+            Socket clientSocket;
             try
             {
-                socket = _serverSocket.EndAccept(AR);
+                clientSocket = _serverSocket.EndAccept(AR);
             }
             catch (ObjectDisposedException) // I cannot seem to avoid this (on exit when properly closing sockets)
             {
                 return;
             }
-            Console.WriteLine("User accepted");
-            socket.BeginAccept(AcceptUser, null);
-            socket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, socket);
+            _serverSocket.BeginAccept(AcceptUser, null);
+            clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, clientSocket);
         }
         private static void ReceiveUsername(IAsyncResult AR)
         {
-            Socket current = (Socket)AR.AsyncState;
+            Socket clientSocket = (Socket) AR.AsyncState;
             int received;
 
             try
             {
-                received = current.EndReceive(AR);
+                received = clientSocket.EndReceive(AR);
             }
             catch (SocketException)
             {
-                current.Close();
+                clientSocket.Close();
                 return;
             }
 
@@ -85,23 +84,22 @@ namespace EnterSomething
             string text = Encoding.ASCII.GetString(recBuf);
             if (text.Substring(0, 9) == "Username:")
             {
-                _users.Add(new User(current, text.Substring(9)));
-                _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
-                Thread tSend = new Thread(delegate ()
+                _users.Add(new User(clientSocket, text.Substring(9)));
+                _gui.tbServerOutput.Invoke((MethodInvoker) delegate ()
                 {
-                    _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    while (!_serverSocket.Connected)
-                    {
-                        _serverSocket.Connect(current.RemoteEndPoint as IPEndPoint);
-                    }
-                    SendCommand("!accepted", current);
+                    _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
                 });
-                current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
+                SendCommand("!accepted", clientSocket);
+                clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, clientSocket);
             }
             else
             {
-                _serverSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, current);
+                clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveUsername, clientSocket);
             }
+        }
+        private void editText()
+        {
+
         }
         private static void ReceiveMessage(IAsyncResult AR)
         {
@@ -137,7 +135,10 @@ namespace EnterSomething
             }
             else
             {
-                _gui.tbServerOutput.Text += text;
+                _gui.tbServerOutput.Invoke((MethodInvoker)delegate ()
+                {
+                    _gui.tbServerOutput.Text += text;
+                });
             }
             current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
         }
@@ -153,7 +154,10 @@ namespace EnterSomething
                 {
                     if (user.getSocket() == userSocket)
                     {
-                        Console.WriteLine("[Server] User " + user.getUsername() + " disconnected\r\n");
+                        _gui.tbServerOutput.Invoke((MethodInvoker)delegate ()
+                        {
+                            _gui.tbServerOutput.Text += "[Server] User " + user.getUsername() + " disconnected\r\n";
+                        });
                         _users.Remove(new User(userSocket, user.getUsername()));
                     }
                 }

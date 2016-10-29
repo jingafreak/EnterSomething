@@ -204,7 +204,7 @@ namespace EnterSomething_Client
             this.tlpClientConnect.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpClientConnect.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpClientConnect.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tlpClientConnect.Size = new System.Drawing.Size(184, 111);
+            this.tlpClientConnect.Size = new System.Drawing.Size(184, 82);
             this.tlpClientConnect.TabIndex = 6;
             // 
             // tbClientIP
@@ -246,7 +246,7 @@ namespace EnterSomething_Client
             // btnClientConnect
             // 
             this.btnClientConnect.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.btnClientConnect.Location = new System.Drawing.Point(67, 70);
+            this.btnClientConnect.Location = new System.Drawing.Point(67, 55);
             this.btnClientConnect.Name = "btnClientConnect";
             this.btnClientConnect.Size = new System.Drawing.Size(75, 23);
             this.btnClientConnect.TabIndex = 12;
@@ -259,16 +259,16 @@ namespace EnterSomething_Client
             this.AcceptButton = this.btnClientConnect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(184, 111);
+            this.ClientSize = new System.Drawing.Size(184, 82);
             this.Controls.Add(this.tlpClientConnect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(200, 150);
+            this.MinimumSize = new System.Drawing.Size(200, 121);
             this.Name = "GUI";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Jinga Chat";
+            this.Text = "EnterSomething";
             this.Resize += new System.EventHandler(this.MainDialog_Resize);
             this.tlpClientMain.ResumeLayout(false);
             this.tlpClientChats.ResumeLayout(false);

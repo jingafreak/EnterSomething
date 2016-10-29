@@ -60,7 +60,7 @@ namespace EnterSomething
             this.tlpServerMain.Name = "tlpServerMain";
             this.tlpServerMain.RowCount = 1;
             this.tlpServerMain.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpServerMain.Size = new System.Drawing.Size(676, 325);
+            this.tlpServerMain.Size = new System.Drawing.Size(676, 294);
             this.tlpServerMain.TabIndex = 0;
             // 
             // tlpServerChats
@@ -78,7 +78,7 @@ namespace EnterSomething
             this.tlpServerChats.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tlpServerChats.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpServerChats.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tlpServerChats.Size = new System.Drawing.Size(150, 319);
+            this.tlpServerChats.Size = new System.Drawing.Size(150, 288);
             this.tlpServerChats.TabIndex = 1;
             // 
             // lblServerChats
@@ -117,7 +117,7 @@ namespace EnterSomething
             this.tlpServerButtons.Name = "tlpServerButtons";
             this.tlpServerButtons.RowCount = 1;
             this.tlpServerButtons.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpServerButtons.Size = new System.Drawing.Size(150, 58);
+            this.tlpServerButtons.Size = new System.Drawing.Size(150, 27);
             this.tlpServerButtons.TabIndex = 2;
             // 
             // btnStopServer
@@ -154,7 +154,7 @@ namespace EnterSomething
             this.tlpServerIO.RowCount = 2;
             this.tlpServerIO.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tlpServerIO.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tlpServerIO.Size = new System.Drawing.Size(526, 319);
+            this.tlpServerIO.Size = new System.Drawing.Size(526, 288);
             this.tlpServerIO.TabIndex = 2;
             // 
             // tbServerOutput
@@ -182,7 +182,7 @@ namespace EnterSomething
             this.tlpServerInput.Name = "tlpServerInput";
             this.tlpServerInput.RowCount = 1;
             this.tlpServerInput.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tlpServerInput.Size = new System.Drawing.Size(526, 58);
+            this.tlpServerInput.Size = new System.Drawing.Size(526, 27);
             this.tlpServerInput.TabIndex = 3;
             // 
             // tbServerInput
@@ -191,12 +191,12 @@ namespace EnterSomething
             this.tbServerInput.Location = new System.Drawing.Point(3, 3);
             this.tbServerInput.Name = "tbServerInput";
             this.tbServerInput.ReadOnly = true;
-            this.tbServerInput.Size = new System.Drawing.Size(460, 20);
+            this.tbServerInput.Size = new System.Drawing.Size(473, 20);
             this.tbServerInput.TabIndex = 0;
             // 
             // btnServerSend
             // 
-            this.btnServerSend.Location = new System.Drawing.Point(469, 3);
+            this.btnServerSend.Location = new System.Drawing.Point(482, 3);
             this.btnServerSend.Name = "btnServerSend";
             this.btnServerSend.Size = new System.Drawing.Size(41, 20);
             this.btnServerSend.TabIndex = 1;
@@ -209,13 +209,13 @@ namespace EnterSomething
             this.AcceptButton = this.btnServerSend;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(676, 325);
+            this.ClientSize = new System.Drawing.Size(676, 294);
             this.Controls.Add(this.tlpServerMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(692, 364);
+            this.MinimumSize = new System.Drawing.Size(692, 333);
             this.Name = "GUI";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Jinga Chat";
+            this.Text = "EnterSomething - Server";
             this.Resize += new System.EventHandler(this.MainDialog_Resize);
             this.tlpServerMain.ResumeLayout(false);
             this.tlpServerChats.ResumeLayout(false);
