@@ -47,7 +47,7 @@ namespace EnterSomething_Client
             {
                 SendUsername();
                 Console.WriteLine(_clientConnected);
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
             Console.WriteLine(_clientConnected);
         }
@@ -79,12 +79,14 @@ namespace EnterSomething_Client
             string text = Encoding.ASCII.GetString(recBuf);
             if (text.Substring(0, 1) == "!")
             {
-                Console.WriteLine("its a command: \"" + text + "\"");
                 ValidateCommand(text, serverSocket);
             }
             else
             {
-                _gui.tbClientOutput.Text += text;
+                _gui.tbClientOutput.Invoke((MethodInvoker)delegate ()
+                {
+                    _gui.tbClientOutput.Text += text;
+                });
             }
             _clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, _clientSocket);
         }

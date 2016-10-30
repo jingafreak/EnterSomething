@@ -48,6 +48,8 @@ namespace EnterSomething
         }
         private void btnServerSend_Click(object sender, EventArgs e)
         {
+            Server.SendMessage();
+            this.tbServerInput.Text = "";
         }
         #endregion
     }   // class GUI

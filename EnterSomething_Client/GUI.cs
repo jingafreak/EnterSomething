@@ -67,6 +67,7 @@ namespace EnterSomething_Client
         private void btnClientSend_Click(object sender, EventArgs e)
         {
             Client.SendMessage();
+            this.tbClientInput.Text = "";
         }
         #endregion
     }   // class GUI

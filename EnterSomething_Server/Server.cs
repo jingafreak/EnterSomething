@@ -89,6 +89,7 @@ namespace EnterSomething
                 {
                     _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
                 });
+                SendMessageToOthers("[Server] User " + text.Substring(9) + " connected\r\n", new User(clientSocket, text.Substring(9)));
                 SendCommand("!accepted", clientSocket);
                 clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, clientSocket);
             }
@@ -103,25 +104,25 @@ namespace EnterSomething
         }
         private static void ReceiveMessage(IAsyncResult AR)
         {
-            Socket current = (Socket)AR.AsyncState;
+            Socket clientSocket = (Socket)AR.AsyncState;
             int received;
 
             try
             {
-                received = current.EndReceive(AR);
+                received = clientSocket.EndReceive(AR);
             }
             catch (SocketException)
             {
                 // Don't shutdown because the socket may be disposed and its disconnected anyway.
                 foreach (User user in _users)
                 {
-                    if (user.getSocket() == current)
+                    if (user.getSocket() == clientSocket)
                     {
                         Console.WriteLine("[Server] User " + user.getUsername() + " disconnected\r\n");
-                        _users.Remove(new User(current, user.getUsername()));
+                        _users.Remove(new User(clientSocket, user.getUsername()));
                     }
                 }
-                current.Close();
+                clientSocket.Close();
                 
                 return;
             }
@@ -131,7 +132,7 @@ namespace EnterSomething
             string text = Encoding.ASCII.GetString(recBuf);
             if (text.Substring(0, 1) == "!")
             {
-                ValidateCommand(text, current);
+                ValidateCommand(text, clientSocket);
             }
             else
             {
@@ -139,9 +140,38 @@ namespace EnterSomething
                 {
                     _gui.tbServerOutput.Text += text;
                 });
+                User sourceUser = null;
+
+                foreach (User user in _users)
+                {
+                    if (user.getSocket() == clientSocket)
+                        sourceUser = user;
+                }
+                if (sourceUser == null)
+                    throw new UserNotFoundException("User not found");
+                SendMessageToOthers(text, sourceUser);
             }
-            current.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, current);
+            clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, clientSocket);
         }
+        public static void SendMessage()
+        {
+            byte[] buffer = Encoding.ASCII.GetBytes("[Server] " + _gui.tbServerInput.Text + "\r\n");
+            foreach (User user in _users)
+            {
+                user.getSocket().Send(buffer, 0, buffer.Length, SocketFlags.None);
+            }
+        }
+        public static void SendMessageToOthers(String message, User sourceUser)
+        {
+            byte[] buffer = Encoding.ASCII.GetBytes(message);
+            foreach (User user in _users)
+            {
+                if (user != sourceUser)
+                {
+                    user.getSocket().Send(buffer, 0, buffer.Length, SocketFlags.None);
+                }
+            }
+        } 
         public static void SendCommand(String command, Socket clientSocket)
         {
             byte[] buffer = Encoding.ASCII.GetBytes(command);
@@ -182,6 +212,33 @@ namespace EnterSomething
         public String getUsername()
         {
             return username;
+        }
+
+        public static bool operator ==(User user1, User user2)
+        {
+            if (object.ReferenceEquals(user1, null) && object.ReferenceEquals(user2, null))
+                return true;
+            if ((object.ReferenceEquals(user1, null) && !object.ReferenceEquals(user2, null))
+                || (!object.ReferenceEquals(user1, null) && object.ReferenceEquals(user2, null)))
+                return false;
+            if (user1.socket == user2.socket && user1.username == user2.username)
+                return true;
+            else
+                return false;
+        }
+        public static bool operator !=(User user1, User user2)
+        {
+            if (object.ReferenceEquals(user1, null) && object.ReferenceEquals(user2, null))
+                return false;
+            if ((object.ReferenceEquals(user1, null) && !object.ReferenceEquals(user2, null))
+                || (!object.ReferenceEquals(user1, null) && object.ReferenceEquals(user2, null)))
+                return true;
+            if (user1 == null && user2 == null)
+                return false;
+            if (user1.socket == user2.socket && user1.username == user2.username)
+                return false;
+            else
+                return true;
         }
     }
 }
