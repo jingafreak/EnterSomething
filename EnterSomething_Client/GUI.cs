@@ -20,54 +20,54 @@ namespace EnterSomething_Client
         {
             Control control = (Control)sender;
 
-            this.tbClientOutput.Height = control.Size.Height - 109;
-            this.lvClient.Height = control.Size.Height - 129;
+            tbClientOutput.Height = control.Size.Height - 109;
+            lvClient.Height = control.Size.Height - 129;
 
-            this.tbClientOutput.Width = control.Size.Width - 186;
-            this.tbClientInput.Width = control.Size.Width - 232;
+            tbClientOutput.Width = control.Size.Width - 186;
+            tbClientInput.Width = control.Size.Width - 232;
         }
         #endregion
 
         #region Client
         private void btnClientConnect_Click(object sender, EventArgs e)
         {
-            if (tbClientUsername.Text != "" && tbClientIP.Text != "")
+            if (!string.IsNullOrWhitespace(tbClientUsername.Text) && !string.IsNullOrWhitespace(tbClientIP.Text))
             {
-                this.AcceptButton = btnClientSend;
-                this.Controls.Clear();
-                this.Controls.Add(tlpClientMain);
-                this.MinimumSize = new Size(692, 364);
-                this.Size = new Size(692, 364);
-                this.MaximizeBox = true;
-                this.MinimizeBox = true;
-                this.FormBorderStyle = FormBorderStyle.Sizable;
-                this.CenterToScreen();
+                AcceptButton = btnClientSend;
+                Controls.Clear();
+                Controls.Add(tlpClientMain);
+                MinimumSize = new Size(692, 364);
+                Size = new Size(692, 364);
+                MaximizeBox = true;
+                MinimizeBox = true;
+                FormBorderStyle = FormBorderStyle.Sizable;
+                CenterToScreen();
                 
                 Client.Connect(this);
 
-                this.tbClientIP.Text = "";
-                this.tbClientUsername.Text = "";
-                this.tbClientInput.ReadOnly = false;
+                tbClientIP.Text = "";
+                tbClientUsername.Text = "";
+                tbClientInput.ReadOnly = false;
             }
             else
             {
                 MessageBox.Show("Please enter IP and Username", "Wrong input",
                            MessageBoxButtons.OK, MessageBoxIcon.Exclamation,
                            MessageBoxDefaultButton.Button1);
-                this.tbClientUsername.Text = "";
-                this.tbClientIP.Text = "";
+                tbClientUsername.Text = "";
+                tbClientIP.Text = "";
             }
         }
         private void btnClientDisconnect_Click(object sender, EventArgs e)
         {
             Client.Disconnect();
-            this.Controls.Clear();
-            this.Controls.Add(tlpClientConnect);
+            Controls.Clear();
+            Controls.Add(tlpClientConnect);
         }
         private void btnClientSend_Click(object sender, EventArgs e)
         {
             Client.SendMessage();
-            this.tbClientInput.Text = "";
+            tbClientInput.Text = "";
         }
         #endregion
     }   // class GUI
