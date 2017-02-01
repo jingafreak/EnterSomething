@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
@@ -17,14 +17,14 @@ namespace EnterSomething
         private static byte[] buffer = new byte[BUFFER_SIZE];
 
         private static List<User> _users = new List<User>();
-        private static GUI _gui;
+        private GUI _gui;
 
         public static void SetupServer(GUI gui)
         {
-            Server._gui = gui;
+            _gui = gui;
             if (!_serverOnline)
             {
-                _gui.tbServerOutput.Text += "[Server] Setting up Server...\r\n";
+                _gui.tbServerOutput.Text += "[Server] Setting up Server..." + Environment.NewLine;
 
                 _serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 _serverSocket.Bind(new IPEndPoint(IPAddress.Any, PORT));
@@ -33,10 +33,10 @@ namespace EnterSomething
 
                 _serverOnline = true;
 
-                _gui.tbServerOutput.Text += "[Server] ...Server mounted\r\n";
+                _gui.tbServerOutput.Text += "[Server] ...Server mounted" + Environment.NewLine;
             } else
             {
-                _gui.tbServerOutput.Text += "[Server] Server allready mounted\r\n";
+                _gui.tbServerOutput.Text += "[Server] Server allready mounted" + Environment.NewLine;
             }
         }
         public static void ShutdownServer()
@@ -48,7 +48,7 @@ namespace EnterSomething
             }
             _serverSocket.Close();
             _serverOnline = false;
-            _gui.tbServerOutput.Text += "[Server] Server Shutdown successfull\r\n";
+            _gui.tbServerOutput.Text += "[Server] Server Shutdown successfull" + Environment.NewLine;
         }
         private static void AcceptUser(IAsyncResult AR)
         {
@@ -66,14 +66,14 @@ namespace EnterSomething
         }
         private static void ReceiveUsername(IAsyncResult AR)
         {
-            Socket clientSocket = (Socket) AR.AsyncState;
+            var clientSocket = (Socket) AR.AsyncState;
             int received;
 
             try
             {
                 received = clientSocket.EndReceive(AR);
             }
-            catch (SocketException)
+            catch (Exception)
             {
                 clientSocket.Close();
                 return;
@@ -87,9 +87,9 @@ namespace EnterSomething
                 _users.Add(new User(clientSocket, text.Substring(9)));
                 _gui.tbServerOutput.Invoke((MethodInvoker) delegate ()
                 {
-                    _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected\r\n";
+                    _gui.tbServerOutput.Text += "[Server] User " + text.Substring(9) + " connected" + Environment.NewLine;
                 });
-                SendMessageToOthers("[Server] User " + text.Substring(9) + " connected\r\n", new User(clientSocket, text.Substring(9)));
+                SendMessageToOthers("[Server] User " + text.Substring(9) + " connected" + Environment.NewLine, new User(clientSocket, text.Substring(9)));
                 SendCommand("!accepted", clientSocket);
                 clientSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveMessage, clientSocket);
             }
@@ -118,7 +118,7 @@ namespace EnterSomething
                 {
                     if (user.getSocket() == clientSocket)
                     {
-                        Console.WriteLine("[Server] User " + user.getUsername() + " disconnected\r\n");
+                        Console.WriteLine("[Server] User " + user.getUsername() + " disconnected" + Environment.NewLine);
                         _users.Remove(new User(clientSocket, user.getUsername()));
                     }
                 }
@@ -155,7 +155,7 @@ namespace EnterSomething
         }
         public static void SendMessage()
         {
-            byte[] buffer = Encoding.ASCII.GetBytes("[Server] " + _gui.tbServerInput.Text + "\r\n");
+            byte[] buffer = Encoding.ASCII.GetBytes("[Server] " + _gui.tbServerInput.Text  + Environment.NewLine);
             foreach (User user in _users)
             {
                 user.getSocket().Send(buffer, 0, buffer.Length, SocketFlags.None);
@@ -186,7 +186,7 @@ namespace EnterSomething
                     {
                         _gui.tbServerOutput.Invoke((MethodInvoker)delegate ()
                         {
-                            _gui.tbServerOutput.Text += "[Server] User " + user.getUsername() + " disconnected\r\n";
+                            _gui.tbServerOutput.Text += "[Server] User " + user.getUsername() + " disconnected" + Environment.NewLine;
                         });
                         _users.Remove(new User(userSocket, user.getUsername()));
                     }
@@ -199,8 +199,8 @@ namespace EnterSomething
     public class User
     {
         private Socket socket;
-        private String username;
-        public User(Socket socket, String username)
+        private string username;
+        public User(Socket socket, string username)
         {
             this.socket = socket;
             this.username = username;
@@ -209,7 +209,7 @@ namespace EnterSomething
         {
             return socket;
         }
-        public String getUsername()
+        public string getUsername()
         {
             return username;
         }
