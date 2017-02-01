@@ -18,13 +18,13 @@ namespace EnterSomething
         }
         private void MainDialog_Resize(object sender, System.EventArgs e)
         {
-            Control control = (Control)sender;
+            var control = (Control)sender;
 
-            this.tbServerOutput.Height = control.Size.Height - 109;
-            this.lvServer.Height = control.Size.Height - 129;
+            tbServerOutput.Height = control.Size.Height - 109;
+            lvServer.Height = control.Size.Height - 129;
 
-            this.tbServerOutput.Width = control.Size.Width - 186;
-            this.tbServerInput.Width = control.Size.Width - 232;
+            tbServerOutput.Width = control.Size.Width - 186;
+            tbServerInput.Width = control.Size.Width - 232;
         }
         #endregion
 
@@ -43,13 +43,13 @@ namespace EnterSomething
             }
             else
             {
-                tbServerOutput.Text += "Server is already down\r\n";
+                tbServerOutput.Text += "Server is already down" + Environment.NewLine;
             }
         }
         private void btnServerSend_Click(object sender, EventArgs e)
         {
             Server.SendMessage();
-            this.tbServerInput.Text = "";
+            tbServerInput.Text = string.Empty;
         }
         #endregion
     }   // class GUI
